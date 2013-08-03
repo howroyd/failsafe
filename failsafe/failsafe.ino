@@ -1,10 +1,15 @@
-#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/mavlink.h"        // Mavlink interface
 #include <Servo.h>
+
+#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/mavlink.h"        // Mavlink interface
 #include "comms.h"
+#include "fcs.h"
 
 /* Attached Devices */
 CommsGcs GCS(Serial);
 CommsUav UAV(Serial1);
+Fcs controller;
+int KILLSWITCH = 0;
+int killPulse = 0;
 
 /* System States */
 enum State {
@@ -13,7 +18,7 @@ State state = Working;
 
 /* System Errors */
 enum Error {
-  None, Comms, Gps, Apm};
+  None, Comms, Gps, Apm, Kill};
 Error error = None;
 
 /* System Methods */
@@ -30,14 +35,20 @@ void setup() {
   // Setup UART 3
 
   // Setup PWMIN 1
+  do {
+    killPulse = pulseIn(KILLSWITCH, HIGH);
+  } 
+  while (killPulse > 1500 && killPulse < 1000);
 
-  // Setup PWMOUT 0
-  // Setup PWMOUT 1
-  // Setup PWMOUT 2
-  // Setup PWMOUT 3
+  // Setup PWMOUT
+  controller.connect();
 }
 
 void loop() {
+  killPulse = pulseIn(KILLSWITCH, HIGH); // Timeout 1s = 0 return
+  if (killPulse > 1500 && killPulse < 1000)
+    error = Kill; // TODO comms loss triggers this
+
   GCS.communication_receive();
   UAV.communication_receive();
 
@@ -56,6 +67,10 @@ void loop() {
 
   case Apm:
     state = Holding;
+    break;
+
+  case Kill:
+    state = Ditching;
     break;
   }
 
@@ -88,7 +103,8 @@ void doHold() {
 }
 
 void doDitch() {
-
+  controller.ditch();
 }
+
 
 
