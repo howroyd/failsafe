@@ -5,7 +5,7 @@
 #include "fcs.h"
 
 /* Attached Devices */
-CommsGcs GCS(Serial);
+CommsGcs GCS(Serial2);
 CommsUav UAV(Serial1);
 Fcs controller;
 int KILLSWITCH = 0;
@@ -32,6 +32,7 @@ void setup() {
   // Setup UART 1
   Serial1.begin(57600);
   // Setup UART 2
+  Serial2.begin(57600);
   // Setup UART 3
 
   // Setup PWMIN 1
@@ -42,9 +43,14 @@ void setup() {
 
   // Setup PWMOUT
   controller.connect();
+  
+  Serial.println("Setup complete");
 }
 
 void loop() {
+  //delay(100);
+  Serial.println("Start loop");
+  
   killPulse = pulseIn(KILLSWITCH, HIGH); // Timeout 1s = 0 return
   if (killPulse > 1500 && killPulse < 1000)
     error = Kill; // TODO comms loss triggers this

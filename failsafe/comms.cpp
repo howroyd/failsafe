@@ -5,7 +5,7 @@ Comms::Comms(HardwareSerial &port)
 {
   _Serial = &port;
   packet_drops = 0;
-  mode = MAV_MODE_UNINIT; /* Defined in mavlink_types.h, which is included by mavlink.h */
+  //mode = MAV_MODE_UNINIT; /* Defined in mavlink_types.h, which is included by mavlink.h */
 }
 
 void Comms::communication_receive(void)
@@ -13,19 +13,23 @@ void Comms::communication_receive(void)
   mavlink_message_t msg;
   mavlink_status_t status;
 
-  // COMMUNICATION THROUGH UART0 (FROM GROUND STATION)
+  if(_Serial->available()) Serial.println("...Data available");
+
+  // COMMUNICATION THROUGH UART
   while(_Serial->available() > 0)
   {
     uint8_t c = _Serial->read();
+    Serial.print(char(c));
     // Try to get a new message
     if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
       // Handle message
+      Serial.println("...Message received!");
       decode(msg);
     }
 
     // And get the next one
   }
-
+  Serial.println("");
   // Update global packet drops counter
   packet_drops += status.packet_rx_drop_count;
 }
@@ -37,7 +41,7 @@ Comms(port)
 {
   _Serial = &port;
   packet_drops = 0;
-  mode = MAV_MODE_UNINIT; /* Defined in mavlink_types.h, which is included by mavlink.h */
+  //mode = MAV_MODE_UNINIT; /* Defined in mavlink_types.h, which is included by mavlink.h */
 }
 
 void CommsGcs::decode(const mavlink_message_t &msg)
@@ -61,7 +65,7 @@ Comms(port)
 {
   _Serial = &port;
   packet_drops = 0;
-  mode = MAV_MODE_UNINIT; /* Defined in mavlink_types.h, which is included by mavlink.h */
+  //mode = MAV_MODE_UNINIT; /* Defined in mavlink_types.h, which is included by mavlink.h */
 }
 
 void CommsUav::decode(const mavlink_message_t &msg)
@@ -71,6 +75,7 @@ void CommsUav::decode(const mavlink_message_t &msg)
   case MAVLINK_MSG_ID_HEARTBEAT:
     heartbeat_lastReceived = millis();
     mavlink_msg_heartbeat_decode(&msg, &heartbeat);
+    Serial.println("......Heartbeat received!");
     break;
   case MAVLINK_MSG_ID_SYS_STATUS:
     sys_status_lastReceived = millis();
@@ -85,4 +90,5 @@ void CommsUav::decode(const mavlink_message_t &msg)
     break;
   }
 }
+
 
