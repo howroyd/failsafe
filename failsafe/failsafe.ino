@@ -1,6 +1,6 @@
 #include <Servo.h>
-
-#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/ardupilotmega/mavlink.h" 
+#include "bodge.h"
+#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/include/mavlink/v1.0/ardupilotmega/mavlink.h" 
 #include "comms.h"
 #include "fcs.h"
 
@@ -50,6 +50,7 @@ void setup() {
 void loop() {
   //delay(100);
   Serial.println("Start loop");
+  Serial.print("...last UAV attitude at: "); Serial.println(UAV.attitude_lastReceived);
   
   killPulse = pulseIn(KILLSWITCH, HIGH); // Timeout 1s = 0 return
   if (killPulse > 1500 && killPulse < 1000)

@@ -9,7 +9,6 @@
 #endif
 #include <math.h>
 
-
 /**
  * @file mavlink_conversions.h
  *
