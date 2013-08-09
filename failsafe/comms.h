@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/mavlink.h" 
+#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/ardupilotmega/mavlink.h" 
 
 /* Abstract base class for mavlink datalink */
 class Comms{

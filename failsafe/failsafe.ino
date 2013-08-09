@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/mavlink.h"        // Mavlink interface
+#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/ardupilotmega/mavlink.h" 
 #include "comms.h"
 #include "fcs.h"
 
