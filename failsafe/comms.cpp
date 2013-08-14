@@ -16,14 +16,14 @@ void Comms::communication_receive(void)
   while(_Serial->available() > 0)
   {
     uint8_t c = _Serial->read();
-    
+
     // Try to get a new message
     if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
-      Serial.print("...Message received! id:");
+      Serial.print("      Message received! id:");
       Serial.println(msg.msgid);
-      
+
       // Handle message
-      this->decode(msg);
+      decode(msg);
     }
 
     // And get the next one
@@ -69,18 +69,22 @@ void CommsUav::decode(const mavlink_message_t &msg)
   switch(msg.msgid)
   {
   case MAVLINK_MSG_ID_HEARTBEAT:
+    Serial.println("         Decoding Heartbeat");
     heartbeat_lastReceived = millis();
     mavlink_msg_heartbeat_decode(&msg, &heartbeat);
     break;
   case MAVLINK_MSG_ID_SYS_STATUS:
+    Serial.println("         Decoding Sys Status");
     sys_status_lastReceived = millis();
     mavlink_msg_sys_status_decode(&msg, &sys_status);
     break;
-  case MAVLINK_MSG_ID_GPS_STATUS:
-    gps_status_lastReceived = millis();
-    mavlink_msg_gps_status_decode(&msg, &gps_status);
+  case MAVLINK_MSG_ID_GPS_RAW_INT:
+    Serial.println("         Decoding GPS Status");
+    gps_raw_int_lastReceived = millis();
+    mavlink_msg_gps_raw_int_decode(&msg, &gps_raw_int);
     break;
   case MAVLINK_MSG_ID_ATTITUDE:
+    Serial.println("         Decoding Attitude");
     attitude_lastReceived = millis();
     mavlink_msg_attitude_decode(&msg, &attitude);
     break;
@@ -89,5 +93,4 @@ void CommsUav::decode(const mavlink_message_t &msg)
     break;
   }
 }
-
 

@@ -1,5 +1,9 @@
+#ifndef FCS_H_
+#define FCS_H_
+
 #include <Arduino.h>
 #include <Servo.h>
+#include "errors.h"
 
 class Fcs{
 public:
@@ -7,6 +11,7 @@ public:
 
   void connect();
 
+  void hold();
   void ditch();
 
   Servo servo1;
@@ -15,3 +20,4 @@ public:
   Servo servo4;
 };
 
+#endif

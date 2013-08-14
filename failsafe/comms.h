@@ -1,6 +1,10 @@
+#ifndef COMMS_H_
+#define COMMS_H_
+
 #include <Arduino.h>
 #include "bodge.h"
-#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/include/mavlink/v1.0/ardupilotmega/mavlink.h" 
+#include "C:/Users/Simon/Documents/GitHub/failsafe/libraries/mavlink/include/include/mavlink/v1.0/ardupilotmega/mavlink.h"
+#include "errors.h"
 
 /* Abstract base class for mavlink datalink */
 class Comms{
@@ -14,19 +18,19 @@ public:
   int mode; /* Defined in mavlink_types.h, which is included by mavlink.h */
 
   HardwareSerial* _Serial;
-  
+
   /* MESSAGES */
   mavlink_heartbeat_t heartbeat;
-  int heartbeat_lastReceived;
-  
-  mavlink_sys_status_t sys_status;
-  int sys_status_lastReceived;
+  unsigned long heartbeat_lastReceived;
 
-  mavlink_gps_status_t gps_status;
-  int gps_status_lastReceived;
-  
+  mavlink_sys_status_t sys_status;
+  unsigned long sys_status_lastReceived;
+
+  mavlink_gps_raw_int_t gps_raw_int;
+  unsigned long gps_raw_int_lastReceived;
+
   mavlink_attitude_t attitude;
-  int attitude_lastReceived;
+  unsigned long attitude_lastReceived;
 };
 
 /* Ground Control Station Datalink */
@@ -49,4 +53,6 @@ public:
 
   void decode(const mavlink_message_t &msg);
 };
+
+#endif
 

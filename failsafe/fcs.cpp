@@ -14,11 +14,16 @@ void Fcs::connect()
   servo2.attach(2);
   servo3.attach(3);
   servo4.attach(4);
-  
+
   servo1.write(90);
   servo2.write(90);
   servo3.write(90);
   servo4.write(90);
+}
+
+void Fcs::hold()
+{
+  return; // Todo
 }
 
 void Fcs::ditch()
@@ -28,3 +33,4 @@ void Fcs::ditch()
   servo3.write(180);
   servo4.write(180);
 }
+
