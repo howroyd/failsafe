@@ -11,7 +11,7 @@ Comms::Comms(HardwareSerial* port)
 
 mavlink_channel_t Comms::next_free_channel = MAVLINK_COMM_0;
 
-void Comms::communication_receive()
+void Comms::communication_receive(void)
 {
   mavlink_message_t msg;
   mavlink_status_t status;
