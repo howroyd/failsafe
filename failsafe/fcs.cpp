@@ -21,6 +21,13 @@ void Fcs::connect()
   servo4.write(90);
 }
 
+boolean Fcs::connected()
+{
+  if (servo1.attached() && servo2.attached() && servo3.attached() && servo4.attached())
+    return true;
+  else return false;
+}
+
 void Fcs::hold()
 {
   return; // Todo
@@ -33,4 +40,5 @@ void Fcs::ditch()
   servo3.write(180);
   servo4.write(180);
 }
+
 
