@@ -1,25 +1,35 @@
 #include "comms.h"
 
 /* Abstract base class for receiving any mavlink datalink */
-Comms::Comms(HardwareSerial &port)
+Comms::Comms(HardwareSerial* port)
 {
-  _Serial = &port;
+  _Serial = port;
   packet_drops = 0;
+  my_channel = next_free_channel;
+  next_free_channel = mavlink_channel_t(int(next_free_channel) + 1);
 }
+
+mavlink_channel_t Comms::next_free_channel = MAVLINK_COMM_0;
 
 void Comms::communication_receive(void)
 {
   mavlink_message_t msg;
   mavlink_status_t status;
 
+  if(_Serial->available()) {
+    Serial.print("\t\tReading some bytes: ");
+    Serial.println(_Serial->available());
+  }
+
   // COMMUNICATION THROUGH UART
   while(_Serial->available() > 0)
   {
     uint8_t c = _Serial->read();
+    //Serial.print(char(c));
 
     // Try to get a new message
-    if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
-      Serial.print("      Message received! id:");
+    if(mavlink_parse_char(my_channel, c, &msg, &status)) {
+      Serial.print("\t\t***Message received! id:");
       Serial.println(msg.msgid);
 
       // Handle message
@@ -34,10 +44,10 @@ void Comms::communication_receive(void)
 
 
 /* Ground Control Station Datalink */
-CommsGcs::CommsGcs(HardwareSerial &port) : 
+CommsGcs::CommsGcs(HardwareSerial* port) : 
 Comms(port)
 {
-  _Serial = &port;
+  _Serial = port;
   packet_drops = 0;
 }
 
@@ -57,10 +67,10 @@ void CommsGcs::decode(const mavlink_message_t &msg)
 
 
 /* UAV Datalink */
-CommsUav::CommsUav(HardwareSerial &port) : 
+CommsUav::CommsUav(HardwareSerial* port) : 
 Comms(port)
 {
-  _Serial = &port;
+  _Serial = port;
   packet_drops = 0;
 }
 
@@ -93,4 +103,5 @@ void CommsUav::decode(const mavlink_message_t &msg)
     break;
   }
 }
+
 

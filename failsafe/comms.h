@@ -9,7 +9,7 @@
 /* Abstract base class for mavlink datalink */
 class Comms{
 public:
-  Comms(HardwareSerial &port);
+  Comms(HardwareSerial* port);
 
   void communication_receive(void);
   virtual void decode(const mavlink_message_t &msg) = 0;
@@ -18,6 +18,10 @@ public:
   int mode; /* Defined in mavlink_types.h, which is included by mavlink.h */
 
   HardwareSerial* _Serial;
+
+  // Track which MAVLink port we are using in each instance
+  static mavlink_channel_t next_free_channel;
+  mavlink_channel_t my_channel;
 
   /* MESSAGES */
   mavlink_heartbeat_t heartbeat;
@@ -38,7 +42,7 @@ class CommsGcs :
 public Comms
 {
 public:
-  CommsGcs(HardwareSerial &port);
+  CommsGcs(HardwareSerial* port);
 
   void decode(const mavlink_message_t &msg);
 };
@@ -49,10 +53,11 @@ class CommsUav :
 public Comms
 {
 public:
-  CommsUav(HardwareSerial &port);
+  CommsUav(HardwareSerial* port);
 
   void decode(const mavlink_message_t &msg);
 };
 
 #endif
+
 

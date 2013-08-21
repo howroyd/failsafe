@@ -14,8 +14,8 @@ boolean LED = LOW;
 int loopCount = 0;
 
 /* Attached Devices */
-CommsGcs GCS(Serial2);
-CommsUav UAV(Serial1);
+CommsUav UAV(&Serial1);
+//CommsGcs GCS(&Serial2);
 Fcs controller;
 int KILLSWITCH = 0;
 int killPulse = 0;
@@ -36,26 +36,48 @@ void doDitch();
 void setup() {
   // Setup UART 0
   Serial.begin(57600);
-  // Setup UART 1
-  Serial1.begin(57600);
-  // Setup UART 2
-  Serial2.begin(57600);
-  // Setup UART 3
+  Serial.print("\n\n**********SETUP**********\n\n");
+
+  Serial.print("Connecting to UART........");
+  do {
+    // Setup UART 1
+    Serial1.begin(57600);
+    // Setup UART 2
+    Serial2.begin(57600);
+    // Setup UART 3
+    Serial3.begin(57600);
+    Serial.print(',');
+  } 
+  while(!(Serial && Serial1 && Serial2 && Serial3));
+  Serial.println("connected");
+
+  //Serial.print("UAV on MAVLink port ");
+  //Serial.println(int(UAV.my_channel));
+  //Serial.print("GCS on MAVLink port ");
+  //Serial.println(int(GCS.my_channel));
 
   // Setup PWMIN 1
-  Serial.println("Waiting for valid PWM");
+  Serial.print("Connecting to killswitch..");
   do {
     killPulse = pulseIn(KILLSWITCH, HIGH);
+    Serial.print(',');
   } 
   while (killPulse < MIN_PWM && killPulse > MAX_PWM);
+  Serial.println("connected");
 
   // Setup PWMOUT
-  controller.connect();
+  Serial.print("Connecting to servos......");
+  do {
+    controller.connect();
+    Serial.print(',');
+  }
+  while (!controller.connected());
+  Serial.println("connected");
 
   // Setup LED
   pinMode(13, OUTPUT);
 
-  Serial.println("Setup complete");
+  Serial.println("\n**********DONE**********\n\n");
 }
 
 void loop() {
@@ -63,27 +85,29 @@ void loop() {
   digitalWrite(13, LED=!LED);
 
   // User information (USB & UART0)
-  Serial.print("Start loop "); 
+  Serial.print("Loop "); 
   Serial.println(loopCount++);
-  Serial.print("   ");
-  Serial.print(Serial1.available()); 
-  Serial.println(" bytes in buffer");
-  Serial.print("   last UAV heartbeat at: "); 
+  //Serial.print("\t");
+  //Serial.print(Serial1.available() + Serial2.available() + Serial3.available()); 
+  //Serial.println(" bytes in buffers");
+  Serial.print("\tlast UAV heartbeat at: "); 
   Serial.println(UAV.heartbeat_lastReceived);
 
   // Killswitch
+  /*
   killPulse = pulseIn(KILLSWITCH, HIGH); // Timeout 1s = 0 return
-  if (killPulse > 1500 && killPulse < 2000) {
-    if (errors.getError(ERROR_KILL) == false) Serial.println("*NEW KILLSWITCH ERROR DETECTED*");
-    errors.setError(ERROR_KILL, true);
-  }
-  else
-    errors.setError(ERROR_KILL, false);
+   if (killPulse > 1500 && killPulse < 2000) {
+   if (errors.getError(ERROR_KILL) == false) Serial.println("*NEW KILLSWITCH ERROR DETECTED*");
+   errors.setError(ERROR_KILL, true);
+   }
+   else
+   errors.setError(ERROR_KILL, false);
+   */
 
   // MAVLink sniffer
-  GCS.communication_receive();
+  //GCS.communication_receive();
   UAV.communication_receive();
-
+/*
   // UAV Comms
   unsigned long heartbeat_uav_delta = millis()-UAV.gps_raw_int_lastReceived;
   if (heartbeat_uav_delta > HEARTBEAT_TIMEOUT) {
@@ -151,6 +175,7 @@ void loop() {
     doDitch();
     break;
   }
+*/
 }
 
 // Do nothing method
@@ -167,5 +192,7 @@ void doHold() {
 void doDitch() {
   controller.ditch();
 }
+
+
 
 

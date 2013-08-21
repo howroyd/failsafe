@@ -11,6 +11,8 @@ public:
 
   void connect();
 
+  boolean connected();
+
   void hold();
   void ditch();
 
@@ -21,3 +23,4 @@ public:
 };
 
 #endif
+
